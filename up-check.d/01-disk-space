@@ -1,0 +1,5 @@
+#!/bin/busybox sh
+# check paritions with usage over 80%
+
+df -h | awk '$5 ~ /^[89]/ {print $0}' | grep /
+[ $? -eq 1 ]

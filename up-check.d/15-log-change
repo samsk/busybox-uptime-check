@@ -1,0 +1,5 @@
+#!/bin/busybox sh
+# file was changed in last 30 minutes
+
+find /var/log/dmesg -mmin -30 | grep /
+[ $? -eq 1 ]

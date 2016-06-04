@@ -1,0 +1,5 @@
+#!/bin/busybox sh
+# check swap usage over 80%
+
+free | awk '/Swap/ && ($3 > ($2 * 0.8)) { print $0 }' | grep Swap
+[ $? -eq 1 ]

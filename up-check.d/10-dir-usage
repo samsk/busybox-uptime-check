@@ -1,0 +1,5 @@
+#!/bin/busybox sh
+# check dirs usage over 500M
+
+du -s /var/log | awk '$1 > 500000 { print $0 }' | grep /
+[ $? -eq 1 ]

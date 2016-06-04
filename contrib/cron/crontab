@@ -1,0 +1,3 @@
+# uptime check
+UPCHECK_DIR=/var/www/up
+*/2 * * * * /usr/local/bin/up-check "$UPCHECK_DIR"

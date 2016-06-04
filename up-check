@@ -1,0 +1,42 @@
+#!/bin/busybox sh
+# check
+
+dir="$1";
+if [ -z "$dir" ];
+then
+	echo "$0: output directory required !" >&2;
+	exit 1;
+fi;
+
+# cleanup old
+find "$dir" -mtime +3 -type f | xargs rm -f
+
+# generate new
+date=`date "+%Y-%m-%d-%H"`;
+out="$dir/$date";
+fail=;
+
+# check
+cd "$0.d" || exit;
+
+rm -f "$out";
+touch "$out";
+
+date "+%Y-%m-%d %H:%M:%S" >$out;
+for i in *;
+do
+	[ -x "$i" ] || continue;
+	name="${i#*-}";
+
+	./$i 2>&1 >>$out;
+	if [ $? -eq 0 ];
+	then
+		echo "$name OK" >>$out;
+	else
+		echo "$name FAILED" >>$out;
+		fail=1;
+	fi;
+done;
+
+# ALL OK
+[ -z "$fail" ] && echo "ALL OK" >>$out;
