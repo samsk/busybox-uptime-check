@@ -19,6 +19,23 @@ fail=;
 # check
 cd "$0.d" || exit;
 
+# some variables
+export UPCHECK_WEEKNUM=`date +%W`;
+export UPCHECK_WEEKDAY=`date +%w`;
+export UPCHECK_HOUR=`date +%H`;
+export UPCHECK_MIN=`date +%M`;
+export UPCHECK_UNIX=`date +%s`;
+export UPCHECK_UTC_UNIX=`date -u +%s`;
+
+# upcheck once a day
+# not realy once, but not whole day because we don't know when remote uptime check comes
+export UPCHECK_ONCE;
+if [ "$UPCHECK_HOUR" -eq 3 -a "$UPCHECK_MIN" -lt 15 ];
+then
+	UPCHECK_ONCE=1;
+fi;
+
+# generate output file
 rm -f "$out";
 touch "$out";
 

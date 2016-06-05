@@ -1,0 +1,23 @@
+#!/bin/busybox sh
+# check if nginx certificates expire within 10 days
+
+# only once a day
+[ -n "${UPCHECK_ONCE}" ] || exit 0;
+
+# 10 days range
+EXPIRE_DAYS=10;
+expire_limit=$(($UPCHECK_UTC_UNIX + 60 * 60 * 24 * $EXPIRE_DAYS))
+
+fail=;
+for cert in `nginx -T 2>/dev/null | awk '$1 == "ssl_certificate" { split($2, a, ";"); print a[1] }' | xargs -n 1 readlink -f | sort -u`;
+do
+	notAfter=`openssl x509 -in "$cert" -noout -enddate | awk -F = '{ print $2 }'`;
+	cert_expire=`date -u -d "${notAfter% GMT*}" +%s`;
+	if [ "$cert_expire" -lt "$expire_limit" ];
+	then
+		echo "$cert EXPIRES WITHIN $EXPIRE_DAYS days on $notAfter !";
+		fail=1;
+	fi;
+done;
+
+[ -z "$fail" ] || exit 1;
