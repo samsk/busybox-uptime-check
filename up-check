@@ -28,9 +28,9 @@ export UPCHECK_UNIX=`date +%s`;
 export UPCHECK_UTC_UNIX=`date -u +%s`;
 
 # upcheck once a day
-# not realy once, but not whole day because we don't know when remote uptime check comes
+# not realy once, but not whole day because we don't know when remote uptime check request comes
 export UPCHECK_ONCE;
-if [ "$UPCHECK_HOUR" -eq 3 -a "$UPCHECK_MIN" -lt 15 ];
+if [ "$UPCHECK_HOUR" -eq 3 -a "$UPCHECK_MIN" -gt 45 ];
 then
 	UPCHECK_ONCE=1;
 fi;
@@ -39,7 +39,8 @@ fi;
 rm -f "$out";
 touch "$out";
 
-date "+%Y-%m-%d %H:%M:%S" >$out;
+date -u "+%Y-%m-%d %H:%M:%S %Z%z" >$out;
+uptime | sed -e 's/^ */uptime: /g' >>$out;
 for i in *;
 do
 	[ -x "$i" ] || continue;
