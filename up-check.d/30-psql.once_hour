@@ -1,0 +1,23 @@
+#!/bin/busybox sh
+# check for database changes
+
+# only once a hour
+[ -n "${UPCHECK_ONCE_HOUR}" ] || exit 0;
+[ -n "${UPCHECK_PSQL}" ] || exit 0;
+
+dbs="$UPCHECK_PSQL";
+
+fail=;
+for db in $dbs;
+do
+	db_name="${db%:*}";
+	db_table="${db#*:}";
+	
+	psql -t -w -U "$UPCHECK_PSQL_USER" "$db_name" -c "SELECT * FROM $db_table WHERE count = 0;" | grep "|";
+	if [ $? -eq 0 ];
+	then
+		echo "DB:$db	- CHECK FAILED";
+		fail=1;
+	fi;
+done;
+[ -z "$fail" ] || exit 1;

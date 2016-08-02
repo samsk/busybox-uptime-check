@@ -1,7 +1,12 @@
 #!/bin/busybox sh
 # check if services are up
 
-ports="80 53 22 25 443 8080";
+if [ -z "$UPCHECK_SERVICES_UP" ];
+then
+	ports="80 53 22 25 443 8080";
+else
+	ports="$UPCHECK_SERVICES_UP";
+fi;
 
 fail=;
 for port in $ports;
@@ -9,7 +14,7 @@ do
 	netstat -tln | awk '$4 !~ /^127.0.0.1/ && $4 ~ /:'"$port"'$/ { print $0 }' | grep -q LISTEN;
 	if [ $? -eq 1 ];
 	then
-		echo "$port	- NOT LISTENING";
+		echo "PORT:$port	- NOT LISTENING";
 		fail=1;
 	fi;
 done;

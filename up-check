@@ -8,6 +8,8 @@ then
 	exit 1;
 fi;
 
+[ -e "$0.conf" ] && source "$0.conf";
+
 # cleanup old
 find "$dir" -mtime +3 -type f | xargs rm -f
 
@@ -33,6 +35,14 @@ export UPCHECK_ONCE;
 if [ "$UPCHECK_HOUR" -eq 3 -a "$UPCHECK_MIN" -gt 45 ];
 then
 	UPCHECK_ONCE=1;
+fi;
+
+# upcheck once a hour
+# not realy once, but not whole hour because we don't know when remote uptime check request comes
+export UPCHECK_ONCE_HOUR;
+if [ "$UPCHECK_MIN" -gt 0 -a "$UPCHECK_MIN" -lt 10 ];
+then
+	UPCHECK_ONCE_HOUR=1;
 fi;
 
 # generate output file
