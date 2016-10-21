@@ -10,9 +10,6 @@ fi;
 
 [ -e "$0.conf" ] && source "$0.conf";
 
-# cleanup old
-find "$dir" -mtime +3 -type f | xargs rm -f
-
 # generate new
 date=`date "+%Y-%m-%d-%H"`;
 out="$dir/$date";
@@ -29,6 +26,9 @@ export UPCHECK_MIN=`date +%M`;
 export UPCHECK_UNIX=`date +%s`;
 export UPCHECK_UTC_UNIX=`date -u +%s`;
 
+# cleanup old
+[ "$UPCHECK_HOUR" = "23" ] && find "$dir" -mtime +7 -type f | xargs rm -f
+
 # upcheck once a day
 # not realy once, but not whole day because we don't know when remote uptime check request comes
 export UPCHECK_ONCE;
@@ -40,12 +40,16 @@ fi;
 # upcheck once a hour
 # not realy once, but not whole hour because we don't know when remote uptime check request comes
 export UPCHECK_ONCE_HOUR;
-if [ "$UPCHECK_MIN" -gt 0 -a "$UPCHECK_MIN" -lt 10 ];
+if [ "$UPCHECK_MIN" -ge 50 ];
 then
 	UPCHECK_ONCE_HOUR=1;
 fi;
 
 # generate output file
+if [ -e "$out" ] && ! grep -q "ALL OK" "$out";
+then
+	mv "$out" "$out-fail";
+fi;
 rm -f "$out";
 touch "$out";
 
@@ -55,6 +59,12 @@ for i in *;
 do
 	[ -x "$i" ] || continue;
 	name="${i#*-}";
+	bname=`echo "${name%.*}" | sed -e 's:-:_:g'`;
+
+	# no check
+	disabled=`echo "\\${UPCHECK_NO_CHECK_$bname}"`;
+	disabled=`eval echo "$disabled"`;
+	[ -n "$disabled" ] && continue;
 
 	./$i 2>&1 >>$out;
 	if [ $? -eq 0 ];

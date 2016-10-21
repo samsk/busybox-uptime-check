@@ -6,6 +6,7 @@ Simple and resilient busybox based system monitoring, intended for use with vari
 
  - Configure nginx to serve selected directory (see *contrib/nginx*)
  - Configure *up-check* to be started from cron (see *contrib/cron*)
+ - Configure variables in *up-check.conf" file residing in same directory as the script itself (always use EXPORT)
  - Add/Modify scripts in *up-check.d* to your needs
  - Configure your remote uptime check service to periodically fetch your url (*https://DOMAIN/DIR/check*) and also look for **ALL OK** string
 

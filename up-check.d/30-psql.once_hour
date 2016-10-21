@@ -3,7 +3,8 @@
 
 # only once a hour
 [ -n "$UPCHECK_ONCE_HOUR" ] || exit 0;
-[ -n "$UPCHECK_PSQL" ] || exit 1;
+[ -n "$UPCHECK_PSQL" ] || exit 0;
+[ -n "$UPCHECK_PSQL_USER" ] || exit 1;
 
 dbs="$UPCHECK_PSQL";
 
